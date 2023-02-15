@@ -402,7 +402,7 @@ export function stackAll(itemsDimensions, groupOrders, lineHeight, stackItems) {
       groupHeights.push(Math.max(groupHeight, lineHeight))
     }
   }
-  
+
   return {
     height: sum(groupHeights),
     groupHeights,
@@ -411,11 +411,11 @@ export function stackAll(itemsDimensions, groupOrders, lineHeight, stackItems) {
 }
 
 /**
- * 
- * @param {*} itemsDimensions 
- * @param {*} isGroupStacked 
- * @param {*} lineHeight 
- * @param {*} groupTop 
+ *
+ * @param {*} itemsDimensions
+ * @param {*} isGroupStacked
+ * @param {*} lineHeight
+ * @param {*} groupTop
  */
 export function stackGroup(itemsDimensions, isGroupStacked, lineHeight, groupTop) {
   var groupHeight = 0
@@ -667,7 +667,9 @@ export function calculateScrollCanvas(
   items,
   groups,
   props,
-  state
+  state,
+  canvasTimeStartOverride = undefined,
+  canvasTimeEndOverride = undefined
 ) {
   const buffer = props.buffer;
   const oldCanvasTimeStart = state.canvasTimeStart
@@ -685,13 +687,14 @@ export function calculateScrollCanvas(
     visibleTimeEnd <= oldCanvasTimeEnd - oldZoom * 0.5
 
   if (!canKeepCanvas || forceUpdateDimensions) {
-    const [canvasTimeStart, canvasTimeEnd] = getCanvasBoundariesFromVisibleTime(
+    let [canvasTimeStart, canvasTimeEnd] = getCanvasBoundariesFromVisibleTime(
       visibleTimeStart,
       visibleTimeEnd,
       buffer
-    )
-    newState.canvasTimeStart = canvasTimeStart
-    newState.canvasTimeEnd = canvasTimeEnd
+    );
+
+    newState.canvasTimeStart = canvasTimeStartOverride || canvasTimeStart;
+    newState.canvasTimeEnd = canvasTimeEndOverride || canvasTimeEnd;
     const mergedState = {
       ...state,
       ...newState

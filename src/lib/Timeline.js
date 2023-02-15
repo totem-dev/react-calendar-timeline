@@ -501,6 +501,8 @@ export default class ReactCalendarTimeline extends Component {
     visibleTimeStart,
     visibleTimeEnd,
     forceUpdateDimensions,
+    canvasTimeStartOverride = undefined,
+    canvasTimeEndOverride = undefined,
     items = this.props.items,
     groups = this.props.groups
   ) => {
@@ -512,7 +514,9 @@ export default class ReactCalendarTimeline extends Component {
         items,
         groups,
         this.props,
-        this.state
+        this.state,
+        canvasTimeStartOverride,
+        canvasTimeEndOverride
       )
     )
   }
