@@ -107,6 +107,9 @@ export default class ReactCalendarTimeline extends Component {
     defaultTimeStart: PropTypes.object,
     defaultTimeEnd: PropTypes.object,
 
+    minTimeStart: PropTypes.object,
+    maxTimeEnd: PropTypes.object,
+
     visibleTimeStart: PropTypes.number,
     visibleTimeEnd: PropTypes.number,
     onTimeChange: PropTypes.func,
@@ -169,6 +172,9 @@ export default class ReactCalendarTimeline extends Component {
 
     defaultTimeStart: null,
     defaultTimeEnd: null,
+
+    minTimeStart: Number.MAX_SAFE_INTEGER,
+    maxTimeEnd: Number.MIN_SAFE_INTEGER,
 
     itemTouchSendsClick: false,
 
@@ -481,15 +487,16 @@ export default class ReactCalendarTimeline extends Component {
 
     const zoom = this.state.visibleTimeEnd - this.state.visibleTimeStart
 
-    const visibleTimeStart = canvasTimeStart + zoom * scrollX / width
+    const visibleTimeStart = Math.max(canvasTimeStart + zoom * scrollX / width, this.props.minTimeStart);
+    const visibleTimeEnd = Math.min(visibleTimeStart + zoom, this.props.maxTimeEnd);
 
     if (
       this.state.visibleTimeStart !== visibleTimeStart ||
-      this.state.visibleTimeEnd !== visibleTimeStart + zoom
+      this.state.visibleTimeEnd !== visibleTimeEnd
     ) {
       this.props.onTimeChange(
         visibleTimeStart,
-        visibleTimeStart + zoom,
+        visibleTimeEnd,
         this.updateScrollCanvas,
         this.getTimelineUnit()
       )
@@ -532,13 +539,20 @@ export default class ReactCalendarTimeline extends Component {
       Math.max(Math.round(oldZoom * scale), minZoom),
       maxZoom
     ) // min 1 min, max 20 years
-    const newVisibleTimeStart = Math.round(
-      this.state.visibleTimeStart + (oldZoom - newZoom) * offset
-    )
+    const newVisibleTimeStart = Math.max(
+      Math.round(
+        this.state.visibleTimeStart + (oldZoom - newZoom) * offset
+      ),
+      this.props.minTimeStart);
+
+    const newVisibleTimeEnd = Math.min(
+      newVisibleTimeStart + newZoom,
+      this.props.maxTimeEnd
+    );
 
     this.props.onTimeChange(
       newVisibleTimeStart,
-      newVisibleTimeStart + newZoom,
+      newVisibleTimeEnd,
       this.updateScrollCanvas,
       this.getTimelineUnit()
     )
